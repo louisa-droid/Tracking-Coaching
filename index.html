@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracking Coaching - François</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .intro {
+            background: #fff9e6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+        }
+
+        .field {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        button.secondary {
+            background: #95a5a6;
+        }
+
+        button.secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .saved-entries {
+            margin-top: 20px;
+        }
+
+        .entry {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #3498db;
+        }
+
+        .entry-date {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .entry-content {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .entry-content p {
+            margin-bottom: 6px;
+        }
+
+        .entry-content strong {
+            color: #555;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: white;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .tab.active {
+            background: white;
+            color: #3498db;
+            border-bottom: 3px solid #3498db;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-style: italic;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+        @media (max-width: 600px) {
+            .row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Tracking Coaching</h1>
+        <div class="intro">
+            Pas de jugement ici, juste des observations. Remplis ce qui te parle quand tu veux. L'idée c'est de voir les patterns, pas de te flageller.
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('daily')">Tracking quotidien</button>
+            <button class="tab" onclick="switchTab('situations')">Situations Oui/Non</button>
+            <button class="tab" onclick="switchTab('depol')">Dépolarisation</button>
+            <button class="tab" onclick="switchTab('notes')">Notes libres</button>
+        </div>
+
+        <!-- TAB 1: Tracking quotidien -->
+        <div id="daily" class="tab-content active">
+            <div class="section">
+                <div class="section-title">Aujourd'hui</div>
+                
+                <div class="row">
+                    <div class="field">
+                        <label>Cannabis (joints/quantité)</label>
+                        <input type="text" id="cannabis" placeholder="ex: 2 joints">
+                    </div>
+                    <div class="field">
+                        <label>Alcool (verres/type)</label>
+                        <input type="text" id="alcool" placeholder="ex: 3 bières">
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label>Comment je me suis senti aujourd'hui ?</label>
+                    <input type="text" id="emotions" placeholder="ex: frustré le matin, mieux l'après-midi">
+                </div>
+
+                <div class="field">
+                    <label>J'ai minimisé quoi aujourd'hui ?</label>
+                    <textarea id="minimise" placeholder="ex: Mon pote m'a fait une remarque qui m'a saoulé, j'ai dit 'c'est bon' mais en vrai ça m'a énervé"></textarea>
+                </div>
+
+                <div class="field">
+                    <label>Pensées violentes ? Contexte ?</label>
+                    <textarea id="violence" placeholder="ex: Oui, dans le métro, un mec m'a bousculé et j'ai imaginé..."></textarea>
+                </div>
+
+                <div class="field">
+                    <label>Juste après, j'ai fait quoi ?</label>
+                    <input type="text" id="apres" placeholder="ex: j'ai fumé / je me suis posé / j'ai marché">
+                </div>
+
+                <button onclick="saveDaily()">Sauvegarder la journée</button>
+            </div>
+
+            <div class="saved-entries" id="dailyEntries"></div>
+        </div>
+
+        <!-- TAB 2: Situations Oui/Non -->
+        <div id="situations" class="tab-content">
+            <div class="section">
+                <div class="section-title">Situation où j'ai dit OUI en pensant NON</div>
+                
+                <div class="field">
+                    <label>Contexte</label>
+                    <textarea id="sit-context" placeholder="Décris la situation"></textarea>
+                </div>
+
+                <div class="field">
+                    <label>Ce que j'ai dit</label>
+                    <input type="text" id="sit-dit" placeholder="ex: 'Oui pas de soucis'">
+                </div>
+
+                <div class="field">
+                    <label>Ce que je pensais vraiment</label>
+                    <input type="text" id="sit-pense" placeholder="ex: 'J'ai pas envie mais bon...'">
+                </div>
+
+                <div class="field">
+                    <label>Qu'est-ce que je risquais à dire non ?</label>
+                    <textarea id="sit-risque" placeholder="ex: Qu'il me trouve relou, qu'on se dispute"></textarea>
+                </div>
+
+                <div class="field">
+                    <label>Si je refaisais en étant 100% honnête, je dirais quoi ?</label>
+                    <textarea id="sit-honnete" placeholder="ex: 'Écoute, là j'ai vraiment pas l'énergie'"></textarea>
+                </div>
+
+                <button onclick="saveSituation()">Sauvegarder la situation</button>
+            </div>
+
+            <div class="saved-entries" id="situationEntries"></div>
+        </div>
+
+        <!-- TAB 3: Dépolarisation -->
+        <div id="depol" class="tab-content">
+            <div class="section">
+                <div class="section-title">Dépolarisation d'une situation</div>
+                
+                <div class="field">
+                    <label>LA SITUATION que je choisis d'analyser</label>
+                    <textarea id="depol-situation" placeholder="Décris la situation où tu t'es effacé"></textarea>
+                </div>
+
+                <div class="field">
+                    <label>LES BÉNÉFICES de m'être effacé</label>
+                    <textarea id="depol-benefices" placeholder="- Qu'est-ce que ça m'a apporté ?&#10;- Qu'est-ce que j'ai évité ?&#10;- Quel genre de personne ça a fait de moi ?"></textarea>
+                </div>
+
+                <div class="field">
+                    <label>LES COÛTS de m'être effacé</label>
+                    <textarea id="depol-couts" placeholder="- Qu'est-ce que je n'ai pas pu exprimer ?&#10;- Quelle émotion j'ai étouffée ?&#10;- Qu'est-ce que ça me coûte à long terme ?"></textarea>
+                </div>
+
+                <div class="field">
+                    <label>CE QUE J'OBSERVE</label>
+                    <textarea id="depol-observe" placeholder="Tes réflexions, ce que tu comprends de toi"></textarea>
+                </div>
+
+                <button onclick="saveDepol()">Sauvegarder l'analyse</button>
+            </div>
+
+            <div class="saved-entries" id="depolEntries"></div>
+        </div>
+
+        <!-- TAB 4: Notes libres -->
+        <div id="notes" class="tab-content">
+            <div class="section">
+                <div class="section-title">Notes libres</div>
+                
+                <div class="field">
+                    <label>Ce qui m'a marqué / Questions / Observations</label>
+                    <textarea id="note-content" placeholder="Tout ce qui te vient, sans filtre"></textarea>
+                </div>
+
+                <button onclick="saveNote()">Sauvegarder la note</button>
+            </div>
+
+            <div class="saved-entries" id="noteEntries"></div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        function getDate() {
+            return new Date().toLocaleDateString('fr-FR', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+
+        function saveDaily() {
+            const entry = {
+                date: getDate(),
+                cannabis: document.getElementById('cannabis').value,
+                alcool: document.getElementById('alcool').value,
+                emotions: document.getElementById('emotions').value,
+                minimise: document.getElementById('minimise').value,
+                violence: document.getElementById('violence').value,
+                apres: document.getElementById('apres').value,
+                timestamp: Date.now()
+            };
+
+            if (!entry.cannabis && !entry.alcool && !entry.emotions) {
+                alert('Remplis au moins un champ !');
+                return;
+            }
+
+            let entries = JSON.parse(localStorage.getItem('dailyEntries') || '[]');
+            entries.unshift(entry);
+            localStorage.setItem('dailyEntries', JSON.stringify(entries));
+
+            document.getElementById('cannabis').value = '';
+            document.getElementById('alcool').value = '';
+            document.getElementById('emotions').value = '';
+            document.getElementById('minimise').value = '';
+            document.getElementById('violence').value = '';
+            document.getElementById('apres').value = '';
+
+            loadDaily();
+        }
+
+        function loadDaily() {
+            const entries = JSON.parse(localStorage.getItem('dailyEntries') || '[]');
+            const container = document.getElementById('dailyEntries');
+            
+            if (entries.length === 0) {
+                container.innerHTML = '<div class="empty-state">Pas encore d\'entrées</div>';
+                return;
+            }
+
+            container.innerHTML = entries.map((entry, index) => `
+                <div class="entry">
+                    <div class="entry-date">${entry.date}</div>
+                    <div class="entry-content">
+                        ${entry.cannabis ? `<p><strong>Cannabis :</strong> ${entry.cannabis}</p>` : ''}
+                        ${entry.alcool ? `<p><strong>Alcool :</strong> ${entry.alcool}</p>` : ''}
+                        ${entry.emotions ? `<p><strong>Émotions :</strong> ${entry.emotions}</p>` : ''}
+                        ${entry.minimise ? `<p><strong>Minimisé :</strong> ${entry.minimise}</p>` : ''}
+                        ${entry.violence ? `<p><strong>Violence :</strong> ${entry.violence}</p>` : ''}
+                        ${entry.apres ? `<p><strong>Après :</strong> ${entry.apres}</p>` : ''}
+                    </div>
+                    <button class="delete-btn" onclick="deleteEntry('dailyEntries', ${index})">Supprimer</button>
+                </div>
+            `).join('');
+        }
+
+        function saveSituation() {
+            const entry = {
+                date: getDate(),
+                context: document.getElementById('sit-context').value,
+                dit: document.getElementById('sit-dit').value,
+                pense: document.getElementById('sit-pense').value,
+                risque: document.getElementById('sit-risque').value,
+                honnete: document.getElementById('sit-honnete').value,
+                timestamp: Date.now()
+            };
+
+            if (!entry.context) {
+                alert('Décris au moins le contexte !');
+                return;
+            }
+
+            let entries = JSON.parse(localStorage.getItem('situationEntries') || '[]');
+            entries.unshift(entry);
+            localStorage.setItem('situationEntries', JSON.stringify(entries));
+
+            document.getElementById('sit-context').value = '';
+            document.getElementById('sit-dit').value = '';
+            document.getElementById('sit-pense').value = '';
+            document.getElementById('sit-risque').value = '';
+            document.getElementById('sit-honnete').value = '';
+
+            loadSituations();
+        }
+
+        function loadSituations() {
+            const entries = JSON.parse(localStorage.getItem('situationEntries') || '[]');
+            const container = document.getElementById('situationEntries');
+            
+            if (entries.length === 0) {
+                container.innerHTML = '<div class="empty-state">Pas encore de situations</div>';
+                return;
+            }
+
+            container.innerHTML = entries.map((entry, index) => `
+                <div class="entry">
+                    <div class="entry-date">${entry.date}</div>
+                    <div class="entry-content">
+                        <p><strong>Contexte :</strong> ${entry.context}</p>
+                        ${entry.dit ? `<p><strong>Ce que j'ai dit :</strong> ${entry.dit}</p>` : ''}
+                        ${entry.pense ? `<p><strong>Ce que je pensais :</strong> ${entry.pense}</p>` : ''}
+                        ${entry.risque ? `<p><strong>Risque :</strong> ${entry.risque}</p>` : ''}
+                        ${entry.honnete ? `<p><strong>En étant honnête :</strong> ${entry.honnete}</p>` : ''}
+                    </div>
+                    <button class="delete-btn" onclick="deleteEntry('situationEntries', ${index})">Supprimer</button>
+                </div>
+            `).join('');
+        }
+
+        function saveDepol() {
+            const entry = {
+                date: getDate(),
+                situation: document.getElementById('depol-situation').value,
+                benefices: document.getElementById('depol-benefices').value,
+                couts: document.getElementById('depol-couts').value,
+                observe: document.getElementById('depol-observe').value,
+                timestamp: Date.now()
+            };
+
+            if (!entry.situation) {
+                alert('Décris au moins la situation !');
+                return;
+            }
+
+            let entries = JSON.parse(localStorage.getItem('depolEntries') || '[]');
+            entries.unshift(entry);
+            localStorage.setItem('depolEntries', JSON.stringify(entries));
+
+            document.getElementById('depol-situation').value = '';
+            document.getElementById('depol-benefices').value = '';
+            document.getElementById('depol-couts').value = '';
+            document.getElementById('depol-observe').value = '';
+
+            loadDepol();
+        }
+
+        function loadDepol() {
+            const entries = JSON.parse(localStorage.getItem('depolEntries') || '[]');
+            const container = document.getElementById('depolEntries');
+            
+            if (entries.length === 0) {
+                container.innerHTML = '<div class="empty-state">Pas encore d\'analyses</div>';
+                return;
+            }
+
+            container.innerHTML = entries.map((entry, index) => `
+                <div class="entry">
+                    <div class="entry-date">${entry.date}</div>
+                    <div class="entry-content">
+                        <p><strong>Situation :</strong> ${entry.situation}</p>
+                        ${entry.benefices ? `<p><strong>Bénéfices :</strong> ${entry.benefices}</p>` : ''}
+                        ${entry.couts ? `<p><strong>Coûts :</strong> ${entry.couts}</p>` : ''}
+                        ${entry.observe ? `<p><strong>Observations :</strong> ${entry.observe}</p>` : ''}
+                    </div>
+                    <button class="delete-btn" onclick="deleteEntry('depolEntries', ${index})">Supprimer</button>
+                </div>
+            `).join('');
+        }
+
+        function saveNote() {
+            const entry = {
+                date: getDate(),
+                content: document.getElementById('note-content').value,
+                timestamp: Date.now()
+            };
+
+            if (!entry.content) {
+                alert('Écris quelque chose !');
+                return;
+            }
+
+            let entries = JSON.parse(localStorage.getItem('noteEntries') || '[]');
+            entries.unshift(entry);
+            localStorage.setItem('noteEntries', JSON.stringify(entries));
+
+            document.getElementById('note-content').value = '';
+
+            loadNotes();
+        }
+
+        function loadNotes() {
+            const entries = JSON.parse(localStorage.getItem('noteEntries') || '[]');
+            const container = document.getElementById('noteEntries');
+            
+            if (entries.length === 0) {
+                container.innerHTML = '<div class="empty-state">Pas encore de notes</div>';
+                return;
+            }
+
+            container.innerHTML = entries.map((entry, index) => `
+                <div class="entry">
+                    <div class="entry-date">${entry.date}</div>
+                    <div class="entry-content">
+                        <p>${entry.content}</p>
+                    </div>
+                    <button class="delete-btn" onclick="deleteEntry('noteEntries', ${index})">Supprimer</button>
+                </div>
+            `).join('');
+        }
+
+        function deleteEntry(storageKey, index) {
+            if (!confirm('Supprimer cette entrée ?')) return;
+            
+            let entries = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            entries.splice(index, 1);
+            localStorage.setItem(storageKey, JSON.stringify(entries));
+            
+            if (storageKey === 'dailyEntries') loadDaily();
+            if (storageKey === 'situationEntries') loadSituations();
+            if (storageKey === 'depolEntries') loadDepol();
+            if (storageKey === 'noteEntries') loadNotes();
+        }
+
+        // Load all on start
+        loadDaily();
+        loadSituations();
+        loadDepol();
+        loadNotes();
+    </script>
+</body>
+</html>
